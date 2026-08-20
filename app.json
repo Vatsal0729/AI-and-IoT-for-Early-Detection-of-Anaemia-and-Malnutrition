@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "HemoNutri AI",
+    "slug": "hemonutri-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1565C0"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hemonutri.ai",
+      "infoPlist": {
+        "NSCameraUsageDescription": "HemoNutri AI needs camera access for PPG fingertip scanning, conjunctiva eye scanning, MUAC arm measurement, and facial analysis.",
+        "NSPhotoLibraryUsageDescription": "HemoNutri AI needs photo library access to save Health Passport documents."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1565C0"
+      },
+      "package": "com.hemonutri.ai",
+      "permissions": [
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "FLASHLIGHT"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "HemoNutri AI needs camera access for non-invasive health screening."
+        }
+      ]
+    ]
+  }
+}
