@@ -257,16 +257,16 @@ export function getSeverityLabel(severity: string): string {
   switch (severity) {
     case 'no_anemia':
     case 'normal':
-      return 'No Anemia';
+      return 'Optimal';
     case 'borderline_anemia':
     case 'mild':
-      return 'Borderline Anemia';
+      return 'Borderline';
     case 'anemia':
     case 'moderate':
-      return 'Anemia';
+      return 'Moderate Deficiency';
     case 'severe_anemia':
     case 'severe':
-      return 'Severe Anemia';
+      return 'Critical Deficiency';
     default:
       return 'Not Evaluated';
   }

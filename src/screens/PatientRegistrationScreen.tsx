@@ -102,7 +102,7 @@ export default function PatientRegistrationScreen({ navigation }: Props) {
               mode="outlined"
               style={styles.input}
               error={!!errors.name}
-              placeholder="e.g. Priya Sharma"
+              placeholder="e.g. Rajesh Sharma"
             />
             {errors.name && <HelperText type="error" visible={true}>{errors.name}</HelperText>}
 
@@ -116,7 +116,7 @@ export default function PatientRegistrationScreen({ navigation }: Props) {
                   mode="outlined"
                   style={styles.input}
                   error={!!errors.age}
-                  placeholder="e.g. 3"
+                  placeholder={ageUnit === 'months' ? 'e.g. 18' : 'e.g. 28'}
                 />
               </View>
               <View style={{ flex: 1 }}>
@@ -153,7 +153,7 @@ export default function PatientRegistrationScreen({ navigation }: Props) {
               mode="outlined"
               style={styles.input}
               error={!!errors.weight}
-              placeholder="e.g. 14.5"
+              placeholder="e.g. 58.5"
             />
             {errors.weight && <HelperText type="error" visible={true}>{errors.weight}</HelperText>}
 

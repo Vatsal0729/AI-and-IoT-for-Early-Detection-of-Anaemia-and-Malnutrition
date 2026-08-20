@@ -185,7 +185,7 @@ export default function HomeScreen({ navigation }: Props) {
             <Text style={styles.headerTitle}>HemoNutri AI</Text>
             <IconButton icon="heart-pulse" iconColor={colors.primary} size={24} style={{ margin: 0 }} />
           </View>
-          <Text style={styles.headerSubtitle}>Field Triage & Diagnostic Suite</Text>
+          <Text style={styles.headerSubtitle}>Universal Triage & Diagnostic Suite (All Ages)</Text>
         </View>
 
         {/* Stats Row */}
@@ -198,7 +198,7 @@ export default function HomeScreen({ navigation }: Props) {
             <Text style={[styles.statValue, { color: stats.anemiaDetected > 0 ? colors.anemiaModerate : colors.primary }]}>
               {stats.anemiaDetected}
             </Text>
-            <Text style={styles.statLabel}>Anemia</Text>
+            <Text style={styles.statLabel}>Low Hb</Text>
           </Card>
           <Card style={styles.statCard}>
             <Text style={[styles.statValue, { color: stats.malnutritionDetected > 0 ? colors.muacOrange : colors.primary }]}>
