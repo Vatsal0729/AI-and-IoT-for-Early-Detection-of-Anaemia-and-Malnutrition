@@ -93,6 +93,29 @@ export default function HomeScreen({ navigation }: Props) {
     }
   };
 
+  const handleClearAllData = () => {
+    Alert.alert(
+      'Reset Database',
+      'Are you sure you want to permanently delete all patient profiles, historical measurements, and the cached CSV file? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete All', 
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await clearAllData();
+              await loadData();
+              Alert.alert('Database Reset', 'All patient and scan data has been deleted.');
+            } catch (err: any) {
+              Alert.alert('Error', 'Failed to delete some files.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const renderPatient = ({ item }: { item: PatientWithSession }) => {
     const session = item.latestSession;
     const hb = session?.anemiaResult?.hbEstimate?.value;
@@ -250,6 +273,16 @@ export default function HomeScreen({ navigation }: Props) {
               Export CSV
             </Button>
           </View>
+          <Button
+            mode="text"
+            icon="delete-outline"
+            onPress={handleClearAllData}
+            style={{ marginTop: spacing.sm, alignSelf: 'center' }}
+            textColor={colors.critical}
+            compact
+          >
+            Clear Local Database
+          </Button>
         </Surface>
 
         {/* Recent Patients */}
