@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, SafeAreaView, Animated, Alert, Image } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet, Dimensions, SafeAreaView, Alert, Image } from 'react-native';
 import { Button, Text, Surface, ProgressBar, IconButton, ActivityIndicator } from 'react-native-paper';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -16,79 +16,55 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 export default function FaceScanScreen({ route, navigation }: Props) {
   const { patient, muac } = route.params;
   const [permission, requestPermission] = useCameraPermissions();
-  const [faceDetected, setFaceDetected] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
-  const cameraRef = useRef<any>(null);
-  const detectIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const cameraRef = useRef<CameraView | undefined>(undefined);
 
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(fadeAnim, { toValue: 0.6, duration: 900, useNativeDriver: true }),
-        Animated.timing(fadeAnim, { toValue: 1.0, duration: 900, useNativeDriver: true }),
-      ])
-    ).start();
-    return () => {
-      if (detectIntervalRef.current) clearInterval(detectIntervalRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!permission?.granted) requestPermission();
-  }, [permission]);
-
-  // Poll for face presence by sampling center luminance from camera frames
-  useEffect(() => {
-    if (!permission?.granted) return;
-    detectIntervalRef.current = setInterval(async () => {
-      try {
-        if (!cameraRef.current || isCapturing || isAnalyzing) return;
-        const snap = await cameraRef.current.takePictureAsync({
-          skipProcessing: true,
-          quality: 0.1,
-        });
-        if (!snap?.uri) return;
-        // Sample the center region — a face fills it with mid-range skin-tone luminance
-        const imgW = 200; const imgH = 250;
-        const center = await extractRegionColor(snap.uri, {
-          originX: Math.round(imgW * 0.2),
-          originY: Math.round(imgH * 0.15),
-          width: Math.round(imgW * 0.6),
-          height: Math.round(imgH * 0.65),
-        });
-        // Skin tone luminance is between 60–200. Too dark = no face. Too bright = overexposed.
-        const isLikelyFace = center.luminance > 55 && center.luminance < 215;
-        setFaceDetected(isLikelyFace);
-      } catch {
-        // Silently skip failed snaps
-      }
-    }, 1800);
-
-    return () => {
-      if (detectIntervalRef.current) clearInterval(detectIntervalRef.current);
-    };
-  }, [permission?.granted, isCapturing, isAnalyzing]);
+  React.useEffect(() => {
+    if (permission && !permission.granted && permission.canAskAgain) {
+      requestPermission();
+    }
+  }, [permission, requestPermission]);
 
   const handleCapture = async () => {
-    if (!faceDetected) {
-      Alert.alert('No Face Detected', 'Please position the patient\'s face inside the oval guide and ensure good lighting.');
-      return;
-    }
-    
+    if (isCapturing || isAnalyzing) return;
     setIsCapturing(true);
+
     try {
       const photo = await cameraRef.current?.takePictureAsync({ quality: 0.85 });
-      if (photo?.uri) {
-        setCapturedUri(photo.uri);
-        setIsCapturing(false);
-        runAnalysis(photo.uri);
-      } else {
+      if (!photo?.uri) {
         throw new Error('Photo capture failed');
       }
+
+      // 3. After capture, analyze the center region of the photo
+      const width = photo.width || 800;
+      const height = photo.height || 1000;
+
+      const center = await extractRegionColor(photo.uri, {
+        originX: Math.round(width * 0.2),
+        originY: Math.round(height * 0.175),
+        width: Math.round(width * 0.6),
+        height: Math.round(height * 0.65),
+      });
+
+      const { luminance, r } = center;
+      const isSkinTone = luminance >= 55 && luminance <= 215 && r > 40;
+      const isTooDarkOrBright = luminance < 30 || luminance > 240;
+
+      if (isTooDarkOrBright || !isSkinTone) {
+        setIsCapturing(false);
+        Alert.alert(
+          'No Face Detected',
+          "No face detected. Please ensure the patient's face is centered and well-lit."
+        );
+        return;
+      }
+
+      setCapturedUri(photo.uri);
+      setIsCapturing(false);
+      runAnalysis(photo.uri);
     } catch (e: any) {
       setIsCapturing(false);
       Alert.alert('Capture Error', e?.message || 'Could not capture photo. Please try again.');
@@ -149,7 +125,7 @@ export default function FaceScanScreen({ route, navigation }: Props) {
       setTimeout(() => {
         setIsAnalyzing(false);
         navigation.navigate('NutritionResult', { patient, result: nutritionResult });
-      }, 500);
+      }, 600);
     } catch (err: any) {
       clearInterval(progressTimer);
       setIsAnalyzing(false);
@@ -172,22 +148,23 @@ export default function FaceScanScreen({ route, navigation }: Props) {
   return (
     <SafeAreaView style={styles.container}>
       {isAnalyzing && capturedUri ? (
-        /* Analysis overlay with captured photo */
         <View style={styles.analysisOverlay}>
-          <Image source={{ uri: capturedUri }} style={StyleSheet.absoluteFillObject} blurRadius={4} />
-          <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'center', alignItems: 'center', padding: spacing.xl }]}>
-            <ActivityIndicator size="large" color={colors.secondary} />
-            <Text style={[typography.h3, { color: 'white', marginTop: spacing.md, textAlign: 'center' }]}>
-              Analyzing Facial Biomarkers
-            </Text>
-            <Text style={[typography.body, { color: '#CBD5E1', marginTop: spacing.xs, textAlign: 'center' }]}>
-              Computing subcutaneous fat volume, buccal depth and temporal muscle index...
-            </Text>
-            <ProgressBar
-              progress={analysisProgress}
-              color={colors.secondary}
-              style={{ width: 260, height: 6, borderRadius: 3, marginTop: spacing.lg }}
-            />
+          <Image source={{ uri: capturedUri }} style={StyleSheet.absoluteFillObject} blurRadius={8} />
+          <View style={[StyleSheet.absoluteFillObject, styles.overlayBackground]}>
+            <Surface style={styles.analysisCard} elevation={4}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={[typography.h3, styles.analysisTitle]}>
+                Analyzing...
+              </Text>
+              <Text style={[typography.body, styles.analysisSubtitle]}>
+                Processing facial landmarks and subcutaneous fat distribution
+              </Text>
+              <ProgressBar
+                progress={analysisProgress}
+                color={colors.primary}
+                style={styles.progressBar}
+              />
+            </Surface>
           </View>
         </View>
       ) : (
@@ -195,56 +172,44 @@ export default function FaceScanScreen({ route, navigation }: Props) {
           <CameraView
             style={StyleSheet.absoluteFillObject}
             facing="front"
-            ref={cameraRef}
+            ref={cameraRef as any}
           />
 
-          {/* Top Header */}
           <View style={styles.topHeader}>
             <View>
-              <Text style={styles.headerTitle}>Facial Emaciation Scan</Text>
-              <Text style={styles.headerSub}>{patient.name} • Step 3 of 3</Text>
+              <Text style={styles.headerTitle}>Face Scan · Step 3 of 3</Text>
             </View>
             <IconButton
               icon="home"
-              iconColor="white"
-              size={22}
-              style={{ backgroundColor: colors.primary }}
+              iconColor={colors.primary}
+              size={24}
+              style={{ backgroundColor: colors.surface }}
               onPress={() => navigation.navigate('Home')}
             />
           </View>
 
-          {/* Centered Face Guide Oval */}
           <View style={styles.guideContainer} pointerEvents="none">
-            <Animated.View
-              style={[
-                styles.faceOval,
-                faceDetected ? styles.faceOvalDetected : styles.faceOvalSearching,
-                { opacity: faceDetected ? 1 : fadeAnim },
-              ]}
-            />
-            <Text style={[styles.guideLabel, { color: faceDetected ? colors.success : '#FFD600' }]}>
-              {faceDetected ? '✓ FACE LOCKED' : 'ALIGN FACE IN FRAME'}
-            </Text>
+            <View style={styles.faceOval} />
           </View>
 
-          {/* Bottom Controls */}
           <View style={styles.bottomBar}>
-            <Surface style={styles.hint} elevation={2}>
-              <Text style={[typography.caption, { color: colors.textSecondary, lineHeight: 18 }]}>
-                Center the patient's face in the oval. Ensure even lighting on both cheeks. The button activates when face is detected.
+            <Surface style={styles.bottomPanel} elevation={2}>
+              <Text style={[typography.body, styles.instructionText]}>
+                Center the patient's face inside the blue dashed oval and ensure well-lit surroundings.
               </Text>
+              <Button
+                mode="contained"
+                icon="camera"
+                onPress={handleCapture}
+                disabled={isCapturing}
+                loading={isCapturing}
+                style={styles.captureBtn}
+                buttonColor={colors.primary}
+                labelStyle={typography.bodyBold}
+              >
+                {isCapturing ? 'Capturing...' : 'Capture'}
+              </Button>
             </Surface>
-            <Button
-              mode="contained"
-              icon={isCapturing ? undefined : 'camera'}
-              onPress={handleCapture}
-              disabled={isCapturing}
-              loading={isCapturing}
-              style={[styles.captureBtn, { backgroundColor: faceDetected ? colors.secondary : '#94A3B8' }]}
-              labelStyle={typography.bodyBold}
-            >
-              {isCapturing ? 'Capturing...' : faceDetected ? 'Capture & Analyze Face' : 'Waiting for Face...'}
-            </Button>
           </View>
         </>
       )}
@@ -253,29 +218,56 @@ export default function FaceScanScreen({ route, navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black' },
+  container: { flex: 1, backgroundColor: colors.background },
   analysisOverlay: { flex: 1 },
+  overlayBackground: {
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  analysisCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.xl,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 340,
+  },
+  analysisTitle: {
+    color: colors.textPrimary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  analysisSubtitle: {
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
+    textAlign: 'center',
+  },
+  progressBar: {
+    width: '100%',
+    height: 8,
+    borderRadius: 4,
+    marginTop: spacing.xl,
+    backgroundColor: colors.border,
+  },
   topHeader: {
     position: 'absolute',
-    top: 40,
+    top: 48,
     left: 16,
     right: 16,
     zIndex: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.round,
   },
   headerTitle: {
     ...typography.h3,
-    color: 'white',
-    textShadowColor: 'rgba(0,0,0,0.9)',
-    textShadowRadius: 4,
-  },
-  headerSub: {
-    ...typography.caption,
-    color: '#CBD5E1',
-    textShadowColor: 'rgba(0,0,0,0.9)',
-    textShadowRadius: 4,
+    color: colors.textPrimary,
   },
   guideContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -283,41 +275,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   faceOval: {
-    width: SCREEN_WIDTH * 0.68,
-    height: SCREEN_HEIGHT * 0.42,
-    borderRadius: SCREEN_WIDTH * 0.34,
+    width: SCREEN_WIDTH * 0.6,
+    height: SCREEN_HEIGHT * 0.45,
+    borderRadius: SCREEN_WIDTH * 0.3,
     borderWidth: 3,
-  },
-  faceOvalSearching: {
-    borderColor: '#FFD600',
+    borderColor: colors.primary,
     borderStyle: 'dashed',
-    backgroundColor: 'rgba(255,214,0,0.05)',
-  },
-  faceOvalDetected: {
-    borderColor: colors.success,
-    borderStyle: 'solid',
-    backgroundColor: 'rgba(46,125,50,0.08)',
-  },
-  guideLabel: {
-    marginTop: spacing.sm,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    textShadowColor: 'rgba(0,0,0,0.9)',
-    textShadowRadius: 4,
+    backgroundColor: 'transparent',
   },
   bottomBar: {
     position: 'absolute',
-    bottom: 28,
+    bottom: 32,
     left: 16,
     right: 16,
     zIndex: 10,
   },
-  hint: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    padding: spacing.md,
-    borderRadius: radius.md,
-    marginBottom: spacing.md,
+  bottomPanel: {
+    backgroundColor: colors.surface,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+  },
+  instructionText: {
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: spacing.lg,
   },
   captureBtn: {
     borderRadius: radius.md,

@@ -1,5 +1,5 @@
 // ============================================================================
-// HemoNutri AI — Medical-Grade Theme System
+// HemoNutri AI — Medical-Grade Theme System (White + Blue Accent)
 // ============================================================================
 
 import { MD3LightTheme } from 'react-native-paper';
@@ -8,63 +8,63 @@ import { StyleSheet } from 'react-native';
 // ---- Color Palette ----
 
 export const colors = {
-  // Primary palette
-  primary: '#1565C0',
-  primaryLight: '#42A5F5',
-  primaryDark: '#0D47A1',
-  primaryContainer: '#E3F2FD',
+  // Primary blue palette
+  primary: '#2563EB',
+  primaryLight: '#60A5FA',
+  primaryDark: '#1D4ED8',
+  primaryContainer: '#EFF6FF',
 
-  // Secondary palette
-  secondary: '#00897B',
-  secondaryLight: '#4DB6AC',
-  secondaryDark: '#00695C',
+  // Secondary sky blue palette
+  secondary: '#0EA5E9',
+  secondaryLight: '#38BDF8',
+  secondaryDark: '#0284C7',
 
   // Anemia 4-Tier Severity Colors
-  anemiaNormal: '#2E7D32',      // No Anemia (Green)
-  anemiaBorderline: '#F9A825',  // Borderline Anemia (Yellow)
-  anemiaModerate: '#E65100',    // Anemia (Orange)
-  anemiaSevere: '#C62828',      // Severe Anemia (Red)
+  anemiaNormal: '#16A34A',      // No Anemia (Green)
+  anemiaBorderline: '#F59E0B',  // Borderline Anemia (Yellow)
+  anemiaModerate: '#EA580C',    // Anemia (Orange)
+  anemiaSevere: '#DC2626',      // Severe Anemia (Red)
 
   // MUAC 4-Tier Zone Colors
-  muacGreen: '#4CAF50',         // >= 13.5 cm (Normal)
-  muacYellow: '#FDD835',        // 12.5 - 13.4 cm (At Risk)
-  muacOrange: '#FF9800',        // 11.5 - 12.4 cm (Moderate Malnutrition)
-  muacRed: '#F44336',           // < 11.5 cm (Severe Acute Malnutrition)
+  muacGreen: '#16A34A',         // >= 13.5 cm (Normal)
+  muacYellow: '#F59E0B',        // 12.5 - 13.4 cm (At Risk)
+  muacOrange: '#EA580C',        // 11.5 - 12.4 cm (Moderate Malnutrition)
+  muacRed: '#DC2626',           // < 11.5 cm (Severe Acute Malnutrition)
 
   // Status colors
-  success: '#2E7D32',
-  warning: '#F9A825',
-  danger: '#E65100',
-  critical: '#C62828',
-  info: '#1565C0',
+  success: '#16A34A',
+  warning: '#F59E0B',
+  danger: '#EA580C',
+  critical: '#DC2626',
+  info: '#2563EB',
 
   // PPG waveform colors
-  ppgRed: '#E53935',
-  ppgGreen: '#43A047',
-  ppgBlue: '#1E88E5',
-  ppgGrid: '#E2E8F0',
+  ppgRed: '#DC2626',
+  ppgGreen: '#16A34A',
+  ppgBlue: '#2563EB',
+  ppgGrid: '#F1F5F9',
 
-  // Backgrounds
-  background: '#F8FAFC',
+  // Backgrounds & Surfaces (Pure White Design Language)
+  background: '#FFFFFF',
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
-  surfaceVariant: '#F1F5F9',
+  surfaceVariant: '#F8FAFC',
   surfaceMuted: '#F1F5F9',
 
-  // Text
-  textPrimary: '#0F172A',
-  textSecondary: '#475569',
+  // Typography Colors
+  textPrimary: '#1E293B',
+  textSecondary: '#64748B',
   textTertiary: '#94A3B8',
   textOnPrimary: '#FFFFFF',
   textOnDark: '#FFFFFF',
 
   // Borders & Dividers
-  border: '#CBD5E1',
-  divider: '#E2E8F0',
+  border: '#E2E8F0',
+  divider: '#F1F5F9',
 
-  // Gauge
-  gaugeBackground: '#E2E8F0',
-  gaugeTrack: '#CBD5E1',
+  // Gauge & Meter elements
+  gaugeBackground: '#F1F5F9',
+  gaugeTrack: '#E2E8F0',
 };
 
 // ---- Spacing Scale ----
@@ -82,10 +82,10 @@ export const spacing = {
 
 export const radius = {
   xs: 4,
-  sm: 6,
-  md: 10,
-  lg: 14,
-  xl: 20,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
   round: 999,
 };
 
@@ -127,28 +127,28 @@ export const paperTheme = {
   roundness: radius.md,
 };
 
-// ---- Shadow Presets ----
+// ---- Shadow Presets (Soft & Subtle) ----
 
 export const shadows = {
   card: {
-    shadowColor: '#0F172A',
+    shadowColor: '#1E293B',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
     elevation: 2,
   },
   elevated: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowColor: '#1E293B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
     elevation: 4,
   },
   modal: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
+    shadowColor: '#1E293B',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.10,
+    shadowRadius: 24,
     elevation: 8,
   },
 };
@@ -158,27 +158,23 @@ export const shadows = {
 export const commonStyles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
   },
   screenPadded: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
     padding: spacing.md,
   },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
     ...shadows.card,
   },
   cardElevated: {
     backgroundColor: colors.surface,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
     ...shadows.elevated,
   },
   row: {
@@ -212,8 +208,8 @@ export const commonStyles = StyleSheet.create({
   },
   buttonPrimary: {
     backgroundColor: colors.primary,
-    borderRadius: radius.sm,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingVertical: 12,
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
   },
@@ -223,12 +219,12 @@ export const commonStyles = StyleSheet.create({
   },
   buttonSecondary: {
     backgroundColor: colors.surface,
-    borderRadius: radius.sm,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingVertical: 12,
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.border,
   },
   buttonSecondaryText: {
     color: colors.primary,
