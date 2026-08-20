@@ -69,7 +69,7 @@ export default function AnemiaResultScreen({ route, navigation }: Props) {
 
         {/* Main Result Card */}
         <View style={styles.headerCard}>
-          <Text style={styles.title}>HEMOGLOBIN CONCENTRATION</Text>
+          <Text style={styles.title}>HAEMOGLOBIN CONCENTRATION</Text>
           <Text style={[styles.hbValue, { color: severityColor }]}>
             {hbValue} <Text style={styles.unit}>g/dL</Text>
           </Text>
@@ -137,7 +137,7 @@ export default function AnemiaResultScreen({ route, navigation }: Props) {
             <View style={commonStyles.row}>
               <Avatar.Icon size={40} icon="check-circle-outline" style={{ backgroundColor: colors.surfaceVariant }} color={colors.success} />
               <View style={{ marginLeft: spacing.md, flex: 1 }}>
-                <Text style={typography.captionBold}>HEMOGLOBIN NORMAL</Text>
+                <Text style={typography.captionBold}>HAEMOGLOBIN NORMAL</Text>
                 <Text style={typography.caption}>No pharmaceutical supplementation required. Maintain balanced diet.</Text>
               </View>
             </View>

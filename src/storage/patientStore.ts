@@ -159,7 +159,7 @@ export async function generatePatientsCSVString(): Promise<string> {
     'Registration Date',
     'Total Scans Recorded',
     'Latest Scan Date',
-    'Hemoglobin (g/dL)',
+    'Haemoglobin (g/dL)',
     'Anemia Severity',
     'Pulse Rate (BPM)',
     'Perfusion Index (%)',
