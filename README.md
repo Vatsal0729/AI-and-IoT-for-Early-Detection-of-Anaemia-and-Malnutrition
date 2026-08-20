@@ -13,7 +13,7 @@ HemoNutri AI is a non-invasive, Android-first React Native mobile application bu
   $$\text{ITA} = \arctan\left(\frac{L^* - 50}{b^*}\right) \times \frac{180}{\pi}$$
 - **Bayesian Sensor Fusion**: Combines optical PPG features and palpebral conjunctiva CIE $L^*a^*b^*$ coordinates using Inverse-Variance Bayesian Fusion to derive highly accurate Hemoglobin (Hb) levels.
 
-### 2. 👤 Anthropometric Nutrition Triage (MUAC + Facial Emaciation)
+### 2.  Anthropometric Nutrition Triage (MUAC + Facial Emaciation)
 - **Spatial Arm Scanner**: Calibrated camera-based Mid-Upper Arm Circumference (MUAC) estimation based on horizontal projection boundaries and scale-offset geometry.
 - **Biometric Facial Scanner**: Auto-segments 4 anatomical facial landmarks (Temporal region, Bilateral Buccal Fat Pads, Jawline, and Orbicularis contour) to calculate a **3D Subcutaneous Muscle & Fat Volume Preservation Score** (0–100).
 - **Age/Gender Stratified WHO Classifications**: Calibrated dynamically for infants, children, and adults against WHO growth standards and MSF Emergency Nutrition guidelines.
