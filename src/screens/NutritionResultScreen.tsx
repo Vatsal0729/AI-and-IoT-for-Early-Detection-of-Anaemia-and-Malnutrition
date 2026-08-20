@@ -98,18 +98,23 @@ export default function NutritionResultScreen({ route, navigation }: Props) {
         {muac && (
           <Card style={styles.card}>
             <Card.Content>
-              <Text style={typography.captionBold}>MID-UPPER ARM CIRCUMFERENCE</Text>
+              <Text style={typography.captionBold}>MID-UPPER ARM ANTHROPOMETRY</Text>
               <View style={[commonStyles.rowBetween, { marginVertical: spacing.sm }]}>
-                <Text style={[typography.metric, { color: zoneColor }]}>
-                  {muac.circumferenceCm.toFixed(1)} <Text style={typography.metricUnit}>cm</Text>
-                </Text>
+                <View>
+                  <Text style={[typography.metric, { color: zoneColor }]}>
+                    {muac.circumferenceCm.toFixed(1)} <Text style={typography.metricUnit}>cm</Text>
+                  </Text>
+                  <Text style={[typography.caption, { color: colors.textSecondary }]}>
+                    Diameter: ~{(muac.circumferenceCm / Math.PI).toFixed(1)} cm
+                  </Text>
+                </View>
                 <Surface style={[styles.badge, { backgroundColor: zoneColor + '18', borderColor: zoneColor }]} elevation={0}>
                   <Text style={[typography.captionBold, { color: zoneColor }]}>
                     {getMUACZoneLabel(muacZone ?? 'green').toUpperCase()}
                   </Text>
                 </Surface>
               </View>
-              <MUACBand value={muac.circumferenceCm} zone={muacZone ?? 'green'} />
+              <MUACBand value={muac.circumferenceCm} zone={muacZone ?? 'green'} ageMonths={ageMonths} gender={patient.gender as any} />
             </Card.Content>
           </Card>
         )}
